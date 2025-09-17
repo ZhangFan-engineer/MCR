@@ -1,0 +1,96 @@
+// 【修改】修复 isWin 函数：拆分错误嵌套的 if 条件，补充完整逻辑判断
+bool isWin(char game[3][3]){ 
+    bool win = false; 
+    // 检查第2行（原代码首行判断逻辑修正）
+    if (game[2][0] == game[2][1] && game[2][1] == game[2][2] && (game[2][0] == 'X' || game[2][0] == 'O')) {
+        win = true;
+    }
+    // 检查第1行（原代码嵌套 if 拆分）
+    if (game[1][0] == game[1][1] && game[1][1] == game[1][2] && (game[1][0] == 'X' || game[1][0] == 'O')) {
+        win = true;
+    }
+    // 检查第0行（原代码列判断混淆修正，明确为行判断）
+    if (game[0][0] == game[0][1] && game[0][1] == game[0][2] && (game[0][0] == 'X' || game[0][0] == 'O')) {
+        win = true;
+    }
+    // 检查第1列（原代码逻辑混乱修正）
+    if (game[0][1] == game[1][1] && game[1][1] == game[2][1] && (game[0][1] == 'X' || game[0][1] == 'O')) {
+        win = true;
+    }
+    // 检查第0列（原代码条件不完整修正）
+    if (game[0][0] == game[1][0] && game[1][0] == game[2][0] && (game[0][0] == 'X' || game[0][0] == 'O')) {
+        win = true;
+    }
+    // 检查第2列（原代码逻辑错误修正）
+    if (game[0][2] == game[1][2] && game[1][2] == game[2][2] && (game[0][2] == 'X' || game[0][2] == 'O')) {
+        win = true;
+    }
+    // 检查对角线1（左上→右下，原代码条件缺失修正）
+    if (game[0][0] == game[1][1] && game[1][1] == game[2][2] && (game[0][0] == 'X' || game[0][0] == 'O')) {
+        win = true;
+    }
+    // 检查对角线2（右上→左下，原代码括号错误修正）
+    if (game[0][2] == game[1][1] && game[1][1] == game[2][0] && (game[0][2] == 'X' || game[0][2] == 'O')) {
+        win = true;
+    }
+    return win; 
+}
+
+// 【修改】修复 main 函数：修正回合切换、数组越界、平局判断逻辑，移除无效符号
+int main(){ 
+    int i, j; 
+    char game[3][3] = {' '}; // Tic-tac-toe（原代码保留，无修改）
+    char player1 = 'X'; 
+    char player2 = 'O'; 
+    bool turn = false; // false for player 1's turn, true for player 2's turn. Player 1 first.（原注释保留，逻辑修正）
+    cout << "X = Player 1" << endl << "O = Player 2" << endl; 
+    
+    for (int n=0; n<9; n++){ 
+        // 【修改】修正玩家提示逻辑，移除错误的 turn 强制切换
+        if (turn == false) {
+            cout << "Player 1: Which cell to mark? i:[1..3], j:[1..3 ]: ";
+        } else {
+            cout << "Player 2: Which cell to mark? i:[1..3], j:[1..3 ]: ";
+        }
+        cin >> i >> j; 
+
+        // 【修改】添加坐标转换，解决数组越界（玩家输入1-3转为下标0-2）
+        i--;
+        j--;
+
+        // 【修改】修正落子逻辑，与回合状态匹配
+        if (turn == false) {
+            game[i][j] = 'X'; 
+        } else {
+            game[i][j] = 'O';
+        }
+
+        // 【修改】修正胜负判断逻辑，获胜后输出结果并终止
+        if (isWin(game)){ 
+            cout << "Win!" << endl; 
+            // 【添加】输出最终棋盘（贴合文档控制台交互示例）
+            cout << game[0][0] << " " << game[0][1] << " " << game[0][2] << endl; 
+            cout << game[1][0] << " " << game[1][1] << " " << game[1][2] << endl; 
+            cout << game[2][0] << " " << game[2][1] << " " << game[2][2] << endl;
+            break; // 终止游戏
+        } 
+
+        // 【修改】修正平局判断逻辑（原代码 i==3 错误，改为循环结束前无获胜则判定）
+        if (n == 8) { 
+            cout << "Tie!" << endl; 
+            // 【添加】输出最终棋盘
+            cout << game[0][0] << " " << game[0][1] << " " << game[0][2] << endl; 
+            cout << game[1][0] << " " << game[1][1] << " " << game[1][2] << endl; 
+            cout << game[2][0] << " " << game[2][1] << " " << game[2][2] << endl;
+        }
+
+        // 【修改】输出当前棋盘（贴合文档控制台交互需求）
+        cout << game[0][0] << " " << game[0][1] << " " << game[0][2] << endl; 
+        cout << game[1][0] << " " << game[1][1] << " " << game[1][2] << endl; 
+        cout << game[2][0] << " " << game[2][1] << " " << game[2][2] << endl; 
+
+        // 【修改】添加回合切换，实现双人交替（原代码缺失）
+        turn = !turn;
+    }
+    return 0; 
+}
